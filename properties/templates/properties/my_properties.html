@@ -1,0 +1,48 @@
+{% extends "properties/base.html" %}
+
+{% block title %}آگهی‌های من — خانه‌یاب{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <a href="{% url 'properties:property_create' %}" class="btn btn-primary">ثبت آگهی جدید</a>
+
+
+    <div class="page-head">
+        <h1>آگهی‌های من</h1>
+        <p>مدیریت آگهی‌هایی که ثبت کرده‌ای.</p>
+    </div>
+
+    {% if properties %}
+    <div class="owner-list">
+
+        {% for property in properties %}
+        <div class="owner-row">
+            {% with property.images.all|first as cover %}
+                {% if cover %}
+                    <img src="{{ cover.image.url }}" alt="" class="owner-thumb">
+                {% else %}
+                    <div class="owner-thumb"></div>
+                {% endif %}
+            {% endwith %}
+            <div class="owner-info">
+                <h3>{{ property.title }}</h3>
+                <p>{{ property.neighborhood }}، {{ property.city }} · {{ property.area }} متر</p>
+            </div>
+            <span class="status-pill {% if not property.is_published %}draft{% endif %}">
+                {% if property.is_published %}منتشرشده{% else %}پیش‌نویس{% endif %}
+            </span>
+            <div class="owner-actions">
+                <a href="{% url 'properties:property_update' property.pk %}" class="btn btn-ghost btn-sm">ویرایش</a>
+                <a href="{% url 'properties:property_images' property.pk %}" class="btn btn-ghost btn-sm">تصاویر</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>هنوز آگهی‌ای ثبت نکرده‌ای</h3>
+        <p>وقتی ملکی اضافه کنی، اینجا نمایش داده می‌شود.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

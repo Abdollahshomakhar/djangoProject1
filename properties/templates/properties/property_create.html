@@ -1,0 +1,51 @@
+{% extends "properties/base.html" %}
+
+{% block title %}ثبت آگهی جدید — خانه‌یاب{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="page-head">
+        <h1>ثبت آگهی جدید</h1>
+        <p>اطلاعات ملک را وارد کن.</p>
+    </div>
+
+    <form method="post" class="property-form">
+        {% csrf_token %}
+
+        <label>عنوان</label>
+        <input type="text" name="title" required>
+
+        <label>توضیحات</label>
+        <textarea name="description" rows="5"></textarea>
+
+        <label>متراژ (متر)</label>
+        <input type="number" name="area">
+
+        <label>تعداد اتاق خواب</label>
+        <input type="number" name="bedrooms">
+
+        <label>تعداد سرویس بهداشتی</label>
+        <input type="number" name="bathrooms">
+
+        <label>قیمت (فروش)</label>
+        <input type="number" name="price">
+
+        <label>ودیعه (رهن)</label>
+        <input type="number" name="deposit">
+
+        <label>اجاره ماهانه</label>
+        <input type="number" name="monthly_rent">
+
+        <label>شهر</label>
+        <input type="text" name="city" required>
+
+        <label>محله</label>
+        <input type="text" name="neighborhood">
+
+        <label>آدرس</label>
+        <input type="text" name="address">
+
+        <button type="submit" class="btn btn-primary">ثبت آگهی</button>
+    </form>
+</div>
+{% endblock %}

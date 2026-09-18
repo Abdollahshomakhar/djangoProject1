@@ -1,0 +1,63 @@
+{% extends "properties/base.html" %}
+{% load static %}
+
+{% block title %}آگهی‌های ملکی — خانه‌یاب{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="page-head">
+        <h1>آگهی‌های ملکی</h1>
+        <p>مرور خانه، آپارتمان و زمین‌های موجود برای خرید و اجاره.</p>
+    </div>
+
+    {% if properties %}
+    <div class="property-grid">
+        {% for property in properties %}
+        <a href="{% url 'properties:property_detail' property.slug %}" class="property-card">
+            <div class="card-media">
+                {% with property.images.all|first as cover %}
+                    {% if cover %}
+                        <img src="{{ cover.image.url }}" alt="{{ property.title }}" loading="lazy">
+                    {% else %}
+                        <div class="no-photo">بدون تصویر</div>
+                    {% endif %}
+                {% endwith %}
+                <span class="deal-tag {% if property.deal_type == 'rent' %}rent{% endif %}">
+                    {% if property.deal_type == 'rent' %}اجاره{% else %}فروش{% endif %}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="card-price">
+                    {% if property.deal_type == 'rent' %}
+                        {{ property.monthly_rent|default:"—" }} <span class="unit">تومان / ماه</span>
+                    {% else %}
+                        {{ property.price|default:"—" }} <span class="unit">تومان</span>
+                    {% endif %}
+                </div>
+                <h3 class="card-title">{{ property.title }}</h3>
+                <div class="card-location">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.4 7-12.6A7 7 0 0 0 5 9.4C5 14.6 12 22 12 22z"/><circle cx="12" cy="9" r="2.4"/></svg>
+                    {{ property.neighborhood }}، {{ property.city }}
+                </div>
+                <div class="card-meta">
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 12h18M4 12v7h16v-7M8 12V8a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4"/></svg>
+                        {{ property.bedrooms }} خواب
+                    </span>
+                    <span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        {{ property.area }} متر
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>فعلاً آگهی‌ای ثبت نشده</h3>
+        <p>به‌زودی آگهی‌های جدید اینجا نمایش داده می‌شوند.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "properties/base.html" %}
+
+{% block title %}نقشه‌ی ملک‌ها — خانه‌یاب{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="page-head">
+        <h1>نقشه‌ی ملک‌ها</h1>
+        <p>موقعیت آگهی‌های ثبت‌شده روی نقشه.</p>
+    </div>
+
+    <div id="allPropertiesMap"></div>
+</div>
+
+{{ properties_json|json_script:"properties-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+var points = JSON.parse(document.getElementById('properties-data').textContent);
+
+var map = L.map('allPropertiesMap').setView([35.6892, 51.3890], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19
+}).addTo(map);
+
+var bounds = [];
+points.forEach(function (p) {
+    var marker = L.marker([p.lat, p.lng]).addTo(map);
+    marker.bindPopup('<a href="' + p.url + '">' + p.title + '</a>');
+    bounds.push([p.lat, p.lng]);
+});
+
+if (bounds.length) {
+    map.fitBounds(bounds, { padding: [30, 30] });
+}
+</script>
+{% endblock %}

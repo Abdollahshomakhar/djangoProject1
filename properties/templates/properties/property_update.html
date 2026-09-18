@@ -1,0 +1,71 @@
+{% extends "properties/base.html" %}
+
+{% block title %}ویرایش آگهی — {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-head" style="padding-top:0;">
+        <h1>ویرایش آگهی</h1>
+        <p>اطلاعات ملک را به‌روز کن.</p>
+    </div>
+
+    <div class="form-card">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="field-group full">
+                    <label for="title">عنوان آگهی</label>
+                    <input type="text" id="title" name="title" value="{{ property.title }}" required>
+                </div>
+
+                <div class="field-group full">
+                    <label for="description">توضیحات</label>
+                    <textarea id="description" name="description">{{ property.description }}</textarea>
+                </div>
+
+                <div class="field-group">
+                    <label for="area">متراژ (متر)</label>
+                    <input type="number" id="area" name="area" value="{{ property.area }}">
+                </div>
+                <div class="field-group">
+                    <label for="bedrooms">تعداد خواب</label>
+                    <input type="number" id="bedrooms" name="bedrooms" value="{{ property.bedrooms }}">
+                </div>
+                <div class="field-group">
+                    <label for="bathrooms">تعداد سرویس</label>
+                    <input type="number" id="bathrooms" name="bathrooms" value="{{ property.bathrooms }}">
+                </div>
+                <div class="field-group">
+                    <label for="price">قیمت (تومان)</label>
+                    <input type="number" id="price" name="price" value="{{ property.price }}">
+                </div>
+                <div class="field-group">
+                    <label for="deposit">ودیعه (تومان)</label>
+                    <input type="number" id="deposit" name="deposit" value="{{ property.deposit }}">
+                </div>
+                <div class="field-group">
+                    <label for="monthly_rent">اجاره ماهانه (تومان)</label>
+                    <input type="number" id="monthly_rent" name="monthly_rent" value="{{ property.monthly_rent }}">
+                </div>
+                <div class="field-group">
+                    <label for="city">شهر</label>
+                    <input type="text" id="city" name="city" value="{{ property.city }}">
+                </div>
+                <div class="field-group">
+                    <label for="neighborhood">محله</label>
+                    <input type="text" id="neighborhood" name="neighborhood" value="{{ property.neighborhood }}">
+                </div>
+                <div class="field-group full">
+                    <label for="address">آدرس کامل</label>
+                    <input type="text" id="address" name="address" value="{{ property.address }}">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'properties:property_detail' property.slug %}" class="btn btn-ghost">انصراف</a>
+                <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

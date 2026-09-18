@@ -1,0 +1,138 @@
+{% extends "properties/base.html" %}
+
+{% block title %}جست‌وجوی ملک — خانه‌یاب{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="page-head">
+        <h1>جست‌وجوی ملک</h1>
+        <p>با فیلترهای دقیق، ملک موردنظرت را سریع‌تر پیدا کن.</p>
+    </div>
+
+    <button type="button" class="btn btn-ghost btn-block filter-toggle" id="filterToggleBtn">
+        نمایش فیلترها
+    </button>
+
+    <div class="search-layout">
+        <aside class="filter-panel" id="filterPanel">
+            <h2>فیلترها</h2>
+            <form method="get" action="{% url 'properties:property_search' %}">
+                <div class="field-group">
+                    <label for="q">جست‌وجوی متنی</label>
+                    <input type="text" id="q" name="q" value="{{ query }}" placeholder="عنوان، محله، آدرس...">
+                </div>
+
+                <div class="field-group">
+                    <label for="city">شهر</label>
+                    <input type="text" id="city" name="city" value="{{ city }}" placeholder="مثلاً تهران">
+                </div>
+
+                <div class="field-group">
+                    <label for="neighborhood">محله</label>
+                    <input type="text" id="neighborhood" name="neighborhood" value="{{ neighborhood }}">
+                </div>
+
+                <div class="field-group">
+                    <label for="deal_type">نوع معامله</label>
+                    <select id="deal_type" name="deal_type">
+                        <option value="" {% if not deal_type %}selected{% endif %}>همه</option>
+                        <option value="sale" {% if deal_type == "sale" %}selected{% endif %}>فروش</option>
+                        <option value="rent" {% if deal_type == "rent" %}selected{% endif %}>اجاره</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="property_type">نوع ملک</label>
+                    <select id="property_type" name="property_type">
+                        <option value="" {% if not property_type %}selected{% endif %}>همه</option>
+                        <option value="apartment" {% if property_type == "apartment" %}selected{% endif %}>آپارتمان</option>
+                        <option value="house" {% if property_type == "house" %}selected{% endif %}>خانه ویلایی</option>
+                        <option value="land" {% if property_type == "land" %}selected{% endif %}>زمین</option>
+                        <option value="office" {% if property_type == "office" %}selected{% endif %}>اداری</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label>بازه قیمت (تومان)</label>
+                    <div class="field-row">
+                        <input type="number" name="min_price" value="{{ min_price }}" placeholder="حداقل">
+                        <input type="number" name="max_price" value="{{ max_price }}" placeholder="حداکثر">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>متراژ (متر)</label>
+                    <div class="field-row">
+                        <input type="number" name="min_area" value="{{ min_area }}" placeholder="حداقل">
+                        <input type="number" name="max_area" value="{{ max_area }}" placeholder="حداکثر">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="bedrooms">حداقل تعداد خواب</label>
+                    <select id="bedrooms" name="bedrooms">
+                        <option value="" {% if not bedrooms %}selected{% endif %}>هر تعداد</option>
+                        <option value="1" {% if bedrooms == "1" %}selected{% endif %}>۱+</option>
+                        <option value="2" {% if bedrooms == "2" %}selected{% endif %}>۲+</option>
+                        <option value="3" {% if bedrooms == "3" %}selected{% endif %}>۳+</option>
+                        <option value="4" {% if bedrooms == "4" %}selected{% endif %}>۴+</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">اعمال فیلتر</button>
+                <a href="{% url 'properties:property_search' %}" class="btn btn-ghost btn-block" style="margin-top:8px;">پاک کردن</a>
+            </form>
+        </aside>
+
+        <section>
+            <div class="results-head">
+                <span class="results-count"><strong>{{ properties.count }}</strong> ملک پیدا شد</span>
+            </div>
+
+            {% if properties %}
+            <div class="property-grid">
+                {% for property in properties %}
+                <a href="{% url 'properties:property_detail' property.slug %}" class="property-card">
+                    <div class="card-media">
+                        {% with property.images.all|first as cover %}
+                            {% if cover %}
+                                <img src="{{ cover.image.url }}" alt="{{ property.title }}" loading="lazy">
+                            {% else %}
+                                <div class="no-photo">بدون تصویر</div>
+                            {% endif %}
+                        {% endwith %}
+                        <span class="deal-tag {% if property.deal_type == 'rent' %}rent{% endif %}">
+                            {% if property.deal_type == 'rent' %}اجاره{% else %}فروش{% endif %}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-price">
+                            {% if property.deal_type == 'rent' %}
+                                {{ property.monthly_rent|default:"—" }} <span class="unit">تومان / ماه</span>
+                            {% else %}
+                                {{ property.price|default:"—" }} <span class="unit">تومان</span>
+                            {% endif %}
+                        </div>
+                        <h3 class="card-title">{{ property.title }}</h3>
+                        <div class="card-location">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.4 7-12.6A7 7 0 0 0 5 9.4C5 14.6 12 22 12 22z"/><circle cx="12" cy="9" r="2.4"/></svg>
+                            {{ property.neighborhood }}، {{ property.city }}
+                        </div>
+                        <div class="card-meta">
+                            <span>{{ property.bedrooms }} خواب</span>
+                            <span>{{ property.area }} متر</span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>موردی با این فیلترها پیدا نشد</h3>
+                <p>فیلترها را کمی بازتر کن یا یکی از آن‌ها را پاک کن.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

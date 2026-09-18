@@ -1,0 +1,115 @@
+{% extends "properties/base.html" %}
+
+{% block title %}{{ property.title }} — خانه‌یاب{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="detail-layout">
+        <div>
+            <div class="gallery-main">
+                {% with property.images.all as imgs %}
+                    {% if imgs %}
+                        <img id="mainImage" src="{{ imgs.0.image.url }}" alt="{{ property.title }}">
+                    {% else %}
+                        <div class="no-photo" style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--teal);">بدون تصویر</div>
+                    {% endif %}
+
+                    {% if imgs|length > 1 %}
+                    <div class="gallery-thumbs">
+                        {% for img in imgs %}
+                        <img src="{{ img.image.url }}" alt="" class="{% if forloop.first %}active{% endif %}" onclick="document.getElementById('mainImage').src=this.src; document.querySelectorAll('.gallery-thumbs img').forEach(t=>t.classList.remove('active')); this.classList.add('active');">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <h1 class="detail-title">{{ property.title }}</h1>
+            <div class="detail-location">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7.4 7-12.6A7 7 0 0 0 5 9.4C5 14.6 12 22 12 22z"/><circle cx="12" cy="9" r="2.4"/></svg>
+                {{ property.address }}، {{ property.neighborhood }}، {{ property.city }}
+            </div>
+
+            <div class="detail-facts">
+                <div class="fact"><span class="value">{{ property.area }}</span><span class="label">متراژ (متر)</span></div>
+                <div class="fact"><span class="value">{{ property.bedrooms }}</span><span class="label">اتاق خواب</span></div>
+                <div class="fact"><span class="value">{{ property.bathrooms }}</span><span class="label">سرویس بهداشتی</span></div>
+                <div class="fact">
+                    <span class="value">{% if property.deal_type == 'rent' %}اجاره{% else %}فروش{% endif %}</span>
+                    <span class="label">نوع معامله</span>
+                </div>
+            </div>
+
+            <div class="detail-desc">
+                <h2>توضیحات</h2>
+                <p>{{ property.description|linebreaksbr }}</p>
+            </div>
+
+            {% if property.features.all %}
+            <div class="feature-block">
+                <h2>امکانات</h2>
+                <ul class="feature-list">
+                    {% for feature in property.features.all %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+        <aside class="contact-card">
+            <div class="contact-price">
+                {% if property.deal_type == 'rent' %}
+                    {{ property.monthly_rent|default:"—" }} <span class="unit">تومان / ماه</span>
+                    {% if property.deposit %}<div style="font-size:0.85rem;color:var(--ink-soft);margin-top:2px;">ودیعه: {{ property.deposit }} تومان</div>{% endif %}
+                {% else %}
+                    {{ property.price|default:"—" }} <span class="unit">تومان</span>
+                {% endif %}
+            </div>
+
+            <div class="agent-row">
+                <div class="agent-avatar">{{ property.agent.get_short_name|default:property.agent.username|slice:":1" }}</div>
+                <div>
+                    <div class="agent-name">{{ property.agent.get_full_name|default:property.agent.username }}</div>
+                    <div class="agent-role">مشاور املاک</div>
+                </div>
+            </div>
+
+            <form class="contact-form" id="contactForm" data-action="{% url 'properties:property_contact' property.pk %}">
+                {% csrf_token %}
+                <div class="field-group">
+                    <label for="name">نام شما</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="field-group">
+                    <label for="phone">شماره تماس</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="field-group">
+                    <label for="message">پیام</label>
+                    <textarea id="message" name="message" placeholder="سلام، درباره این ملک سوال داشتم...">سلام، درباره این ملک سوال داشتم...</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">ارسال پیام به مشاور</button>
+            </form>
+            <div class="form-success" id="contactSuccess">پیام شما ارسال شد. مشاور به‌زودی تماس می‌گیرد.</div>
+            <p class="form-note">اطلاعات تماس شما فقط برای این مشاور ارسال می‌شود.</p>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.getElementById('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = new FormData(form);
+    fetch(form.dataset.action, { method: 'POST', body: data })
+        .then(r => r.json())
+        .then(() => {
+            form.style.display = 'none';
+            document.getElementById('contactSuccess').classList.add('is-visible');
+        });
+});
+</script>
+{% endblock %}

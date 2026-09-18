@@ -1,0 +1,40 @@
+{% extends "properties/base.html" %}
+
+{% block title %}مدیریت تصاویر — {{ property.title }}{% endblock %}
+
+{% block content %}
+<div class="form-page">
+    <div class="page-head" style="padding-top:0;">
+        <h1>تصاویر «{{ property.title }}»</h1>
+        <p>عکس‌های ملک را اضافه یا مرور کن.</p>
+    </div>
+
+    <div class="form-card">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label class="upload-drop" for="images">
+                برای افزودن عکس کلیک کن یا فایل را اینجا رها کن
+                <input type="file" id="images" name="images" multiple accept="image/*" style="display:none;" onchange="document.getElementById('fileCount').textContent = this.files.length + ' فایل انتخاب شد';">
+            </label>
+            <p id="fileCount" style="text-align:center;color:var(--ink-soft);font-size:0.85rem;margin-top:-12px;"></p>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">آپلود تصاویر</button>
+            </div>
+        </form>
+
+        {% if images %}
+        <div class="image-manage-grid" style="margin-top:24px;">
+            {% for img in images %}
+            <img src="{{ img.image.url }}" alt="">
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>هنوز عکسی اضافه نشده</h3>
+            <p>حداقل چند عکس خوب، شانس دیده‌شدن آگهی را بیشتر می‌کند.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
